@@ -1,11 +1,28 @@
 use_debug false
-set_volume! 0.5
+set_volume! 1
 
-base_bpm = 75
+base_bpm = 80
 use_bpm base_bpm
 
 home_dir = "/Users/christleijtens/project/private/Sonic Pi experiments/sonic_pi_fur_alina/"
 samps_dir = home_dir + "samps/"
+
+define :rhythm do |volume, n|
+  
+  with_fx :pan, pan: 0, amp: volume do
+    
+    sample :ambi_drone, pitch: -12
+    sample :bd_tek, pan: -1
+    sleep 1
+    
+    (n - 1).times do
+      sample :bd_haus, pan: 1
+      sleep 1
+    end
+    
+  end
+  
+end
 
 instruments_arr = [
   {
@@ -175,9 +192,9 @@ define :fur_alina do
     :Fs4, :B4, :Fs4
   ]
   
-  # total 107 beats
+  # total 111 beats
   fur_alina_timings = [
-    4,
+    4, # 4 beats
     1, 4, # 5 beats
     1, 1, 4, # 6 beats
     1, 1, 1, # 3 beats
@@ -204,6 +221,10 @@ define :fur_alina do
     1, 1, 4 # 6 beats
   ]
   
+  fur_alina_drums_timings = [
+    4, 5, 6, 3, 4, 4, 4, 5, 4, 6, 4, 4, 3, 4, 6, 4, 5, 4, 4, 4, 3, 4, 6, 5, 6
+  ]
+  
   in_thread(name: :melody) do
     
     shift_melody_right = 0
@@ -212,23 +233,26 @@ define :fur_alina do
     
     in_thread(name: :bass) do
       loop do
-        sync :round
         with_synth :piano do
           with_fx :reverb, mix: 1.0, room: 1 do
             play [:B0, :B1], amp: 5, attack_level: 5, attack: 0.01, pan: -1
           end
         end
+        sync :round
       end
     end
     
     in_thread(name: :right) do
       loop do
-        cue :round
+        
         use_bpm new_bpm
         with_fx :reverb, mix: 1, room: 0.5, amp: 2.0 do
+          
           tick_reset
+          
           fur_alina_right_hand.each do
             tick
+            puts "Note right hand: " + fur_alina_right_hand[look].to_s
             playwavnote instrument_samp, instrument_note,
               fur_alina_right_hand[look] + shift_melody_right,
               fur_alina_timings[look], 0.0, instrument_vol
@@ -250,17 +274,22 @@ define :fur_alina do
         
         puts "    - Sample: " + instrument_map[:instrument] + ", volume: " + instrument_vol.to_s
         
+        cue :round
       end
     end
     
     in_thread(name: :left) do
+      
       loop do
-        sync :round
+        
         use_bpm new_bpm
         with_fx :reverb, mix: 1, room: 0.5, amp: 2.0 do
+          
           tick_reset
+          
           fur_alina_left_hand.each do
             tick
+            puts "Note left hand: " + fur_alina_left_hand[look].to_s
             playwavnote instrument_samp, instrument_note,
               fur_alina_left_hand[look] + shift_melody_left,
               fur_alina_timings[look], 0.0, instrument_vol
@@ -271,7 +300,25 @@ define :fur_alina do
         
         puts "Shift left hand: " + shift_melody_left.to_s
         
+        sync :round
       end
+    end
+    
+    in_thread(name: :drum) do
+      
+      loop do
+        
+        use_bpm new_bpm
+        
+        tick_reset
+        
+        fur_alina_drums_timings.each do
+          rhythm 1, fur_alina_drums_timings[tick]
+        end
+        
+        sync :round
+      end
+      
     end
     
   end
