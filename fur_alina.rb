@@ -1,295 +1,111 @@
 use_debug false
-set_volume! 0.5
-
-base_bpm = 75
-use_bpm base_bpm
+set_volume! 4
 
 home_dir = "/Users/christleijtens/project/private/Sonic Pi experiments/sonic_pi_fur_alina/"
 samps_dir = home_dir + "samps/"
 
-instruments_arr = [
-  {
-    instrument: "celesta-e5-hard-PB.wav",
-    note: ":E5",
-    vol: "1.0"
+run_file home_dir + "clitc_sonic_pi_lib.rb"
+run_file home_dir + "fur_alina_house_lib.rb"
+run_file home_dir + "fur_alina_relax_lib.rb"
+
+far_config = {
+  
+  "samps_dir" => samps_dir,
+  "volume" => 2.0,
+  "bpm" => 80,
+  "delay" => 4,
+  "instrument" => "celesta_hard",
+  
+  "instruments" => {
+    
+    "celesta_hard" => {
+      "wav" => "celesta-e5-hard-PB.wav",
+      "note" => :E5,
+      "vol" => 0.4
+    },
+    "cello_sustain" => {
+      "wav" => "cello-sustain-4_Db-PB-loop.wav",
+      "note" => :Db4,
+      "vol" => 0.1
+    },
+    "tubularbells" => {
+      "wav" => "tubularbells-4_Eb_p.wav",
+      "note" => :Eb4,
+      "vol" => 0.4
+    },
+    "cello_vibrato" => {
+      "wav" => "cello-vibrato-4_Bb-PB.wav",
+      "note" => :Bb4,
+      "vol" => 0.1
+    },
+    "cello_tremulo" => {
+      "wav" => "cello-tremulo-4_D_t-PB-loop.wav",
+      "note" => :D4,
+      "vol" => 0.5
+    },
+    "cor_anglais" => {
+      "wav" => "cor-anglais-f4-PB-loop.wav",
+      "note" => :F4,
+      "vol" => 0.5
+    }
   },
-  {
-    instrument: "cello-sustain-4_Db-PB-loop.wav",
-    note: ":Db4",
-    vol: "0.1"
-  },
-  {
-    instrument: "tubularbells-4_Eb_p.wav",
-    note: ":Eb4",
-    vol: "0.4"
-  },
-  {
-    instrument: "cello-vibrato-4_Bb-PB.wav",
-    note: ":Bb4",
-    vol: "0.1"
-  },
-  {
-    instrument: "cello-tremulo-4_D_t-PB-loop.wav",
-    note: ":D4",
-    vol: "0.5"
-  },
-  {
-    instrument: "cor-anglais-f4-PB-loop.wav",
-    note: ":F4",
-    vol: "0.5"
+  
+  "background_sounds" => {
+    
+    "fadeout" => 2,
+    "samps_dir" => samps_dir,
+    "sounds" => {
+      
+      "haunted" => {
+        "samp" => :ambi_haunted_hum,
+        "amp" => 0.2,
+        "pan" => 0.0,
+        "delay" => 0
+      },
+      "waves" => {
+        "samp" => "gulfwaves.wav",
+        "amp" => 0.2,
+        "pan" => 0.0,
+        "delay" => 0
+      },
+      "tropical" => {
+        "samp" => "tropical-forrest.wav",
+        "amp" => 0.2,
+        "pan" => 0.0,
+        "delay" => 0
+      }
+    }
   }
-]
-
-
-
-#
-# Below code (:playwavnote) is from Joe McCarty.
-#   (https://in-thread.sonic-pi.net/u/joemac/summary)
-#
-
-instrument_map = instruments_arr[0]
-instrument_samp = samps_dir + instrument_map[:instrument]
-instrument_note = instrument_map[:note]
-instrument_vol = instrument_map[:vol]
-
-halftone = Math.log(2.0) / 12.0
-octtone = Math.log(2.0)
-centtone = halftone / 100.0
-tempo = 1.0
-
-print ""
-print "  > Für Alina by Arvo Pärt a Sonic Pi version..."
-print "    - Sample: " + instrument_map[:instrument] + ", volume: " + instrument_vol.to_s
-print ""
-
-define :playwavnote do |samp, samp_pitch, pitch, time, cents = 0.0, amp = 1.0, pan = 0.0|
   
-  a = note samp_pitch
-  if a != nil
-    
-    b = note pitch
-    
-    if b != nil
-      
-      r = Math.exp( (b - a) * halftone + cents * centtone)
-      sample samp, rate: r, attack: 0.1,
-        sustain: tempo * time * 1,
-        release: tempo * time * 2.0 / 3.0, amp: amp , pan: pan
-      
-    end
-  end
+} # far_config.
+
+
+
+fah_config = {
   
-  sleep tempo * time
-  
-end # define :playwavenote
+  "synth" => :hollow,
+  "bpm" => 120,
+  "volume" => 2,
+  "delay" => 8
+}
 
+puts ""
+puts ">>> Für Alina by Arvo Pärt - Sonic Pi version by Christ Leijtens"
+puts ""
 
+fur_alina_house fah_config
 
-define :ambient_tropical_sea do
-  
-  in_thread(name: :background) do
-    
-    in_thread do
-      loop do
-        sample :ambi_haunted_hum, amp: 0.3
-        sample :vinyl_hiss, amp: 1
-        sleep 4
-      end
-    end
-    
-    in_thread do
-      loop do
-        sample samps_dir + "gulfwaves.wav", amp: 0.2, pan: -1 # length 62 seconds
-        sleep ( current_bpm / 60 ) * 62
-      end
-    end
-    
-    in_thread do
-      loop do
-        sample samps_dir + "tropical-forrest.wav", amp: 0.2, pan: 1 # length 154 seconds
-        sleep ( current_bpm / 60 ) * 154
-      end
-    end
-    
-  end
-  
-end # define :ambient_tropical_sea
+fur_alina_relax far_config
 
+far_config["instrument"] = "cor_anglais"
+far_config["delay"] = 0
+fur_alina_relax far_config
 
+fah_config["synth"] = :dark_ambience
+fah_config["delay"] = 0
+fur_alina_house fah_config
 
-define :fur_alina do
-  
-  fur_alina_right_hand = [
-    :r,
-    :Cs5, :D5,
-    :E5, :Fs5, :Fs5,
-    :E5, :D5, :Cs5,
-    :B4,
-    :Fs5, :E5, :Fs5, :D5,
-    :E5,
-    :D5, :Fs5, :B5, :Cs6, :B5,
-    :D5,
-    :E5, :D5, :B4, :D5, :Fs5, :D5,
-    :E5,
-    :Fs5, :D6, :Cs6, :B5,
-    :B4, :Fs5, :G5,
-    :A5,
-    :D5, :E5, :B4, :Cs5, :D5, :Cs5,
-    :B4,
-    :A5, :G5, :A5, :B4, :Cs5,
-    :Fs5,
-    :G5, :D5, :E5, :Fs5,
-    :Fs5,
-    :D5, :Cs5, :D4,
-    :E4,
-    :B3, :Fs4, :D5,
-    :B4, :D4,
-    :B4, :Cs5, :B4
-  ]
-  
-  fur_alina_left_hand = [
-    :r,
-    :B4, :B4,
-    :D5, :D5, :D5,
-    :D5, :B4, :B4,
-    :Fs4,
-    :D5, :D5, :D5, :B4,
-    :D5,
-    :B4, :D5, :Fs5, :B5, :Fs5,
-    :B4,
-    :D5, :B4, :Fs4, :B4, :D5, :B4,
-    :D5,
-    :D5, :B5, :B5, :Fs5,
-    :Fs4, :D5, :Fs5,
-    :Fs5,
-    :B4, :D5, :Fs4, :B4, :B4, :B4,
-    :Fs4,
-    :fs5, :Fs5, :Fs5, :Fs4, :B4,
-    :D5,
-    :Fs5, :B4, :D5, :D5,
-    :Cs5,
-    :B4, :Fs4, :B3,
-    :D4,
-    :Fs3, :D4, :B4,
-    :Fs4, :B3,
-    :Fs4, :B4, :Fs4
-  ]
-  
-  # total 107 beats
-  fur_alina_timings = [
-    4,
-    1, 4, # 5 beats
-    1, 1, 4, # 6 beats
-    1, 1, 1, # 3 beats
-    4, # 4 beats
-    1, 1, 1, 1, # 4 beats
-    4, # 4 beats
-    1, 1, 1, 1, 1, # 5 beats
-    4, # 4 beats
-    1, 1, 1, 1, 1, 1, # 6 beats
-    4, # 4 beats
-    1, 1, 1, 1, # 4 beats
-    1, 1, 1, # 3 beats
-    4, # 4 beats
-    1, 1, 1, 1, 1, 1, # 6 beats
-    4, # 4 beats
-    1, 1, 1, 1, 1, # 5 beats
-    4, # 4 beats
-    1, 1, 1, 1, # 4 beats
-    4, # 4 beats
-    1, 1, 1, # 3 beats
-    4, # 4 beats
-    1, 1, 4, # 6 beats
-    1, 4, # 5 beats
-    1, 1, 4 # 6 beats
-  ]
-  
-  in_thread(name: :melody) do
-    
-    shift_melody_right = 0
-    shift_melody_left = 0
-    new_bpm = 60
-    
-    in_thread(name: :bass) do
-      loop do
-        sync :round
-        with_synth :piano do
-          with_fx :reverb, mix: 1.0, room: 1 do
-            play [:B0, :B1], amp: 5, attack_level: 5, attack: 0.01, pan: -1
-          end
-        end
-      end
-    end
-    
-    in_thread(name: :right) do
-      loop do
-        cue :round
-        use_bpm new_bpm
-        with_fx :reverb, mix: 1, room: 0.5, amp: 2.0 do
-          tick_reset
-          fur_alina_right_hand.each do
-            tick
-            playwavnote instrument_samp, instrument_note,
-              fur_alina_right_hand[look] + shift_melody_right,
-              fur_alina_timings[look], 0.0, instrument_vol
-          end
-        end
-        
-        shift_melody_right = choose([-12, 0, 12])
-        
-        puts "Shift right hand: " + shift_melody_right.to_s
-        
-        new_bpm = base_bpm + choose([-10, -5, 0, 5, 10])
-        
-        puts "Set tempo to: " + new_bpm.to_s
-        
-        instrument_map = instruments_arr.choose
-        instrument_samp = samps_dir + instrument_map[:instrument]
-        instrument_note = instrument_map[:note]
-        instrument_vol = instrument_map[:vol]
-        
-        puts "    - Sample: " + instrument_map[:instrument] + ", volume: " + instrument_vol.to_s
-        
-      end
-    end
-    
-    in_thread(name: :left) do
-      loop do
-        sync :round
-        use_bpm new_bpm
-        with_fx :reverb, mix: 1, room: 0.5, amp: 2.0 do
-          tick_reset
-          fur_alina_left_hand.each do
-            tick
-            playwavnote instrument_samp, instrument_note,
-              fur_alina_left_hand[look] + shift_melody_left,
-              fur_alina_timings[look], 0.0, instrument_vol
-          end
-        end
-        
-        shift_melody_left = choose([-12, 0, 12])
-        
-        puts "Shift left hand: " + shift_melody_left.to_s
-        
-      end
-    end
-    
-  end
-  
-end # define :fur_alina
-
-
-#
-# Main program.
-#
-
-# Start the ambient background sound before the melody.
-ambient_tropical_sea
-
-# Sleep 8 beats before playing the melody.
-sleep 8
-
-# Play the melody.
-fur_alina
-
+puts ""
+puts "<<< Thank your for listening."
+puts ""
 
