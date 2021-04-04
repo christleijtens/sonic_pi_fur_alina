@@ -65,9 +65,9 @@ define :clitc_play_background_sounds do | samp_hash |
       
     end # in_thread
     
-    puts "<<<"
-    
   end # samp_hash.each
+  
+  puts "<<<"
   
 end # define :clitc_play_background_sounds
 
@@ -79,7 +79,7 @@ end # define :clitc_play_background_sounds
 #
 define :clitc_thread_prefix do
   
-  return Time.now.strftime("%Y%m%d_%H-%M-%S")
+  return Time.now.strftime("%Y%m%d_%H-%M-%S_")
   
 end # :clitc_thread_prefix
 
@@ -98,7 +98,7 @@ octtone = Math.log(2.0)
 centtone = halftone / 100.0
 tempo = 1.0
 
-define :playwavnote do |samp, samp_pitch, pitch, time, cents = 0.0, amp = 1.0, pan = 0.0|
+define :clitc_playwavnote do |samp, samp_pitch, pitch, time, cents = 0.0, amp = 1.0, pan = 0.0|
   
   a = note samp_pitch
   if a != nil
