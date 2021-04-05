@@ -24,96 +24,11 @@ end # define :fur_alina_relax_rhythm
 
 
 
-define :fur_alina_relax_melody do | instrument, volume |
+define :fur_alina_relax_melody do | instrument, volume, volume_drums |
   
-  fur_alina_right_hand = [
-    :r,
-    :Cs5, :D5,
-    :E5, :Fs5, :Fs5,
-    :E5, :D5, :Cs5,
-    :B4,
-    :Fs5, :E5, :Fs5, :D5,
-    :E5,
-    :D5, :Fs5, :B5, :Cs6, :B5,
-    :D5,
-    :E5, :D5, :B4, :D5, :Fs5, :D5,
-    :E5,
-    :Fs5, :D6, :Cs6, :B5,
-    :B4, :Fs5, :G5,
-    :A5,
-    :D5, :E5, :B4, :Cs5, :D5, :Cs5,
-    :B4,
-    :A5, :G5, :A5, :B4, :Cs5,
-    :Fs5,
-    :G5, :D5, :E5, :Fs5,
-    :Fs5,
-    :D5, :Cs5, :D4,
-    :E4,
-    :B3, :Fs4, :D5,
-    :B4, :D4,
-    :B4, :Cs5, :B4
-  ]
-  
-  fur_alina_left_hand = [
-    :r,
-    :B4, :B4,
-    :D5, :D5, :D5,
-    :D5, :B4, :B4,
-    :Fs4,
-    :D5, :D5, :D5, :B4,
-    :D5,
-    :B4, :D5, :Fs5, :B5, :Fs5,
-    :B4,
-    :D5, :B4, :Fs4, :B4, :D5, :B4,
-    :D5,
-    :D5, :B5, :B5, :Fs5,
-    :Fs4, :D5, :Fs5,
-    :Fs5,
-    :B4, :D5, :Fs4, :B4, :B4, :B4,
-    :Fs4,
-    :fs5, :Fs5, :Fs5, :Fs4, :B4,
-    :D5,
-    :Fs5, :B4, :D5, :D5,
-    :Cs5,
-    :B4, :Fs4, :B3,
-    :D4,
-    :Fs3, :D4, :B4,
-    :Fs4, :B3,
-    :Fs4, :B4, :Fs4
-  ]
-  
-  # total 111 beats
-  fur_alina_timings = [
-    4, # 4 beats
-    1, 4, # 5 beats
-    1, 1, 4, # 6 beats
-    1, 1, 1, # 3 beats
-    4, # 4 beats
-    1, 1, 1, 1, # 4 beats
-    4, # 4 beats
-    1, 1, 1, 1, 1, # 5 beats
-    4, # 4 beats
-    1, 1, 1, 1, 1, 1, # 6 beats
-    4, # 4 beats
-    1, 1, 1, 1, # 4 beats
-    1, 1, 1, # 3 beats
-    4, # 4 beats
-    1, 1, 1, 1, 1, 1, # 6 beats
-    4, # 4 beats
-    1, 1, 1, 1, 1, # 5 beats
-    4, # 4 beats
-    1, 1, 1, 1, # 4 beats
-    4, # 4 beats
-    1, 1, 1, # 3 beats
-    4, # 4 beats
-    1, 1, 4, # 6 beats
-    1, 4, # 5 beats
-    1, 1, 4 # 6 beats
-  ]
-  
-  fur_alina_drums_timings = [
-    5, 6, 3, 4, 4, 4, 5, 4, 6, 4, 4, 3, 4, 6, 4, 5, 4, 4, 4, 3, 4, 6, 5, 6 # 111 beats
-  ]
+  fur_alina_score = get[:fur_alina_score]
+  fur_alina_timings = get[:fur_alina_timings]
+  fur_alina_drums_timings = get[:fur_alina_drums_timings]
   
   puts "WAV: " + instrument["wav"]
   puts "note: " + instrument["note"].to_s
@@ -135,12 +50,12 @@ define :fur_alina_relax_melody do | instrument, volume |
         
         tick_reset
         
-        fur_alina_right_hand.each do
-          puts "Note right hand: " + fur_alina_right_hand[tick].to_s
+        fur_alina_score.each do
+          puts "Note right hand: " + fur_alina_score[tick][1].to_s
           
           clitc_playwavnote instrument["wav"],             # samp
             instrument["note"],                            # samp_pitch
-            fur_alina_right_hand[look],                    # pitch
+            fur_alina_score[look][1],                      # pitch
             fur_alina_timings[look],                       # time
             0.0,                                           # cents
             instrument["vol"],                             # amp
@@ -157,13 +72,13 @@ define :fur_alina_relax_melody do | instrument, volume |
         
         tick_reset
         
-        fur_alina_left_hand.each do
+        fur_alina_score.each do
           
-          puts "Note left hand: " + fur_alina_left_hand[tick].to_s
+          puts "Note left hand: " + fur_alina_score[tick][0].to_s
           
           clitc_playwavnote instrument["wav"],             # samp
             instrument["note"],                            # samp_pitch
-            fur_alina_left_hand[look],                     # pitch
+            fur_alina_score[look][0],                      # pitch
             fur_alina_timings[look],                       # time
             0.0,                                           # cents
             instrument["vol"],                             # amp
@@ -175,13 +90,11 @@ define :fur_alina_relax_melody do | instrument, volume |
     end # in_thread :left
     
     in_thread(name: clitc_thread_prefix + "rhythm") do
-      
-      sleep 4
-      
+            
       tick_reset
       fur_alina_drums_timings.each do
         
-        fur_alina_relax_rhythm volume, fur_alina_drums_timings[tick]
+        fur_alina_relax_rhythm volume_drums, fur_alina_drums_timings[tick]
         
       end
     end # in_thread :rhythm
@@ -209,10 +122,10 @@ define :fur_alina_relax do | far_config |
   
   in_thread(name: clitc_thread_prefix + "far_melody") do
     
-    instrument = far_config["instruments"][far_config["instrument"]]
+    instruments = get[:fur_alina_instruments]
+    instrument = Hash.new.merge(instruments[far_config["instrument"]].to_h)
     instrument["wav"] = far_config["samps_dir"] + instrument["wav"]
-    
-    fur_alina_relax_melody instrument, far_config["volume"]
+    fur_alina_relax_melody instrument, far_config["volume"], far_config["volume_drums"]
     
   end
   
