@@ -65,9 +65,9 @@ define :clitc_play_background_sounds do | samp_hash |
       
     end # in_thread
     
+    puts "<<<"
+    
   end # samp_hash.each
-  
-  puts "<<<"
   
 end # define :clitc_play_background_sounds
 
@@ -118,3 +118,12 @@ define :clitc_playwavnote do |samp, samp_pitch, pitch, time, cents = 0.0, amp = 
   sleep tempo * time
   
 end # define :playwavenote
+
+
+# Plays my adagium.
+define :clitc_adagium do
+  with_fx :flanger, feedback: 0.6 do
+    sample get[:samps_dir] + "adagium.wav", beat_stretch: 4, pitch: -6
+  end
+end # end :clitc_adagium
+
